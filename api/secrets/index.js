@@ -8,5 +8,4 @@
  */
 module.exports = {
   JWT_SECRET: process.env.JWT_SECRET || 'shhh',
-  PORT: process.env.port || 9000,
 }
