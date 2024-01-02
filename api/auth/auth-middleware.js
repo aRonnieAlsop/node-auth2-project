@@ -3,7 +3,20 @@ const { findBy } = require('../users/users-model')
 const jwt = require('jsonwebtoken')
 
 const restricted = (req, res, next) => {
+  const token = req.headers.authorization
+  if (!token) {
+   return  next({ status: 401, message: 'Token required' })
+  }
+  jwt.verify(token, JWT_SECRET, (err, decodedToken) => {
+    if (err) {
+      next({ status: 401, message: 'Token required' })
+    } else {
+      req.decodedToken = decodedToken
+      next()
+    }
+  })
 
+  }
   /*
     If the user does not provide a token in the Authorization header:
     status 401
@@ -19,7 +32,7 @@ const restricted = (req, res, next) => {
 
     Put the decoded token in the req object, to make life easier for middlewares downstream!
   */
-}
+
 
 const only = role_name => (req, res, next) => {
   if (role_name === req.decodedToken.role_name) {
@@ -46,6 +59,7 @@ const checkUsernameExists = async (req, res, next) => {
     if (!user) {
       next({ status: 401, message: 'Invalid credentials'})
     } else {
+      req.user = user
       next()
     }
   } catch (err) {

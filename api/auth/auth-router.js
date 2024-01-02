@@ -29,16 +29,6 @@ router.post("/register", validateRoleName, (req, res, next) => {
 
 
 router.post("/login", checkUsernameExists, (req, res, next) => {
-  const validCreds = bcrypt.compareSync(req.body.password, req.user.password)
-  if (validCreds) {
-    const toekn = createToken(req.user)
-    res.json({
-      message: `${req.user.username} is back!`,
-      token
-    })
-  } else {
-    next({ status: 401, message: 'Invalid credentials' })
-  }
   /**
     [POST] /api/auth/login { "username": "sue", "password": "1234" }
 
@@ -58,6 +48,16 @@ router.post("/login", checkUsernameExists, (req, res, next) => {
       "role_name": "admin" // the role of the authenticated user
     }
    */
+    const validCreds = bcrypt.compareSync(req.body.password, req.user.password)
+    if (validCreds) {
+      const token = createToken(req.user)
+      res.json({
+        message: `${req.user.username} is back!`,
+        token
+      })
+    } else {
+      next({ status: 401, message: 'Invalid credentials' })
+    }
 })
 
 const createToken = (user) => {
